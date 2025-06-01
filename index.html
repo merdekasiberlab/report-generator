@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Generator Report Bug Bounty - Merdeka Siber</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header class="report-header">
+            <h1>AI Generator Report Bug Bounty <span class="pro-badge">Merdeka Siber</span></h1>
+            <p class="tagline">Laporan keamanan berbasis AI yang menyajikan temuan secara sistematis, efisien, dan siap unduh dalam format profesional.!</p>
+        </header>
+
+        <fieldset class="form-section contact-info-form">
+            <legend>Informasi Pelapor</legend>
+            <div class="grid-layout-2col">
+                <div class="form-group">
+                    <label for="reporterName">Nama Pelapor:</label>
+                    <input type="text" id="reporterName" name="reporterName" placeholder="Nama Lengkap Anda" required>
+                </div>
+                <div class="form-group">
+                    <label for="reporterEmail">Email Pelapor:</label>
+                    <input type="email" id="reporterEmail" name="reporterEmail" placeholder="email@contoh.com" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reporterOrganization">Organisasi/Afiliasi (Opsional):</label>
+                <input type="text" id="reporterOrganization" name="reporterOrganization" placeholder="Nama Organisasi">
+            </div>
+            <div class="grid-layout-2col">
+                <div class="form-group">
+                    <label for="reportDate">Tanggal Laporan:</label>
+                    <input type="date" id="reportDate" name="reportDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="reportId">ID Laporan (Otomatis):</label>
+                    <input type="text" id="reportId" name="reportId" readonly>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="api-key-section">
+            <label for="apiKey">Kunci API Gemini (Wajib diisi):</label>
+            <input type="password" id="apiKey" placeholder="Masukkan Kunci API Gemini Anda di sini" required>
+            <button id="toggleApiKeyVisibility" type="button">Tampilkan</button>
+        </div>
+
+        <form id="bugReportForm">
+            <fieldset class="form-section">
+                <legend>Detail Kerentanan</legend>
+                <div class="form-group">
+                    <label for="reportTitle">Judul Laporan Kerentanan:</label>
+                    <input type="text" id="reportTitle" name="reportTitle"
+                        placeholder="Contoh: Stored XSS pada Fitur Unggah Profil via Manipulasi MIME Type" required>
+                </div>
+                <div class="form-group">
+                    <label for="problemDescription">Deskripsi Masalah (Problem Description):</label>
+                    <textarea id="problemDescription" name="problemDescription" rows="6"
+                        placeholder="Ikhtisar umum dan dampak masalah ini. Anda bisa menggunakan referensi OWASP."></textarea>
+                    <button type="button" class="ai-generate-btn" data-target="problemDescription"
+                        data-prompt-base="Berikan deskripsi masalah umum untuk kerentanan berikut: ">Isi dengan
+                        AI</button>
+                </div>
+                <div class="form-group">
+                    <label for="identifiedIssue">Masalah Spesifik yang Diidentifikasi (Identified Issue):</label>
+                    <textarea id="identifiedIssue" name="identifiedIssue" rows="6"
+                        placeholder="Deskripsi teknis yang lebih spesifik tentang bagaimana kerentanan ditemukan dan apa yang salah dalam aplikasi."></textarea>
+                    <button type="button" class="ai-generate-btn" data-target="identifiedIssue"
+                        data-prompt-base="Berikan deskripsi teknis spesifik untuk masalah yang diidentifikasi terkait: ">Isi
+                        dengan AI</button>
+                </div>
+                <div class="form-group">
+                    <label for="affectedUrls">URL/Endpoint/Area yang Terpengaruh:</label>
+                    <textarea id="affectedUrls" name="affectedUrls" rows="4"
+                        placeholder="Contoh: https://example.com/profile/upload (satu URL/path per baris)"></textarea>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Analisis Risiko</legend>
+                <div class="risk-details-grid">
+                    <div>
+                        <label for="riskSeverity">Tingkat Risiko (Severity):</label>
+                        <select id="riskSeverity" name="riskSeverity">
+                            <option value="Kritis">Kritis</option>
+                            <option value="Tinggi">Tinggi</option>
+                            <option value="Sedang" selected>Sedang</option>
+                            <option value="Rendah">Rendah</option>
+                            <option value="Informasional">Informasional</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="exploitDifficulty">Kesulitan Eksploitasi:</label>
+                        <select id="exploitDifficulty" name="exploitDifficulty">
+                            <option value="Rendah">Rendah</option>
+                            <option value="Sedang" selected>Sedang</option>
+                            <option value="Tinggi">Tinggi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cvssScore">Skor CVSS (Contoh: 9.8 atau CVSS:3.1/...):</label>
+                    <input type="text" id="cvssScore" name="cvssScore" placeholder="Contoh: 9.8">
+                </div>
+                <div class="form-group">
+                    <label for="cvssVector">Vektor CVSS (Jika ada):</label>
+                    <input type="text" id="cvssVector" name="cvssVector"
+                        placeholder="Contoh: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H">
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Langkah-langkah Reproduksi (PoC)</legend>
+                <div id="stepsToReproduceContainer">
+                    <div class="step-group">
+                        <textarea name="steps[]" rows="3" placeholder="Langkah 1: Buka URL target..."></textarea>
+                    </div>
+                </div>
+                <button type="button" id="addStepBtn" class="add-remove-btn">Tambah Langkah</button>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Dampak dan Rekomendasi</legend>
+                <div class="form-group">
+                    <label for="affectedDemographics">Basis Demografi/Pengguna yang Terpengaruh & Dampak Bisnis:</label>
+                    <textarea id="affectedDemographics" name="affectedDemographics" rows="4"
+                        placeholder="Siapa saja yang terdampak? Bagaimana dampaknya pada mereka dan pada bisnis?"></textarea>
+                    <button type="button" class="ai-generate-btn" data-target="affectedDemographics"
+                        data-prompt-base="Jelaskan basis demografi/pengguna yang terpengaruh dan potensi dampak bisnis signifikan untuk masalah: ">Isi
+                        dengan AI</button>
+                </div>
+                <div class="form-group">
+                    <label for="recommendedRemediation">Rekomendasi Perbaikan/Remediasi Teknis:</label>
+                    <textarea id="recommendedRemediation" name="recommendedRemediation" rows="6"
+                        placeholder="Saran teknis detail tentang cara memperbaiki kerentanan ini, termasuk contoh kode jika relevan."></textarea>
+                    <button type="button" class="ai-generate-btn" data-target="recommendedRemediation"
+                        data-prompt-base="Berikan rekomendasi perbaikan teknis yang sangat detail, termasuk langkah-langkah konkret atau contoh kode jika memungkinkan, untuk masalah: ">Isi
+                        dengan AI</button>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Materi Pendukung</legend>
+                <div class="form-group">
+                    <label>Referensi:</label>
+                    <div id="referencesContainer">
+                        <div class="reference-group">
+                            <input type="url" name="referenceUrls[]"
+                                placeholder="URL Referensi (misal, dokumentasi OWASP)">
+                            <input type="text" name="referenceDescs[]" placeholder="Deskripsi Singkat Referensi">
+                        </div>
+                    </div>
+                    <button type="button" id="addReferenceBtn" class="add-remove-btn">Tambah Referensi</button>
+                </div>
+                <div class="form-group">
+                    <label for="screenshots">Unggah Tangkapan Layar (Screenshots):</label>
+                    <input type="file" id="screenshots" name="screenshots[]" multiple accept="image/*">
+                    <div id="screenshotPreviews" class="screenshot-previews"></div>
+                </div>
+            </fieldset>
+
+            <div class="form-actions">
+                <button type="button" id="previewReportBtn" class="action-btn preview-btn">Pratinjau Konten</button>
+                <button type="button" id="downloadPdfBtn" class="action-btn download-btn">Unduh PDF Profesional</button>
+                <button type="button" id="autoFillAllBtn" class="action-btn autofill-btn">Isi Otomatis (AI)</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="htmlPreviewArea" style="display:none;">
+        <h2>Pratinjau Konten Laporan (HTML Aman)</h2>
+        <div id="reportContentForHtmlPreview"></div>
+        <button type="button" id="closeHtmlPreview" class="action-btn" style="margin-top:15px;">Tutup Pratinjau</button>
+    </div>
+
+    <div id="loadingIndicator" class="loading-indicator" style="display:none;">
+        <div class="spinner"></div>
+        <p>Memproses... Mohon tunggu...</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
